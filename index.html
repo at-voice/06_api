@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>💄LIP MONSTER HUNTER💋</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Antique+B1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Marker+Hatch&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>LIP MONSTER</h1>
+        <h1>HUNTER💋</h1>
+    </header>
+
+
+    <main>
+
+        <!-- マップ表示エリア -->
+        <div id="map" style="position:relative;width:360px;height:450px;"></div>
+        <div id="output_p"></div>
+
+        <!-- 現在地 -->
+        <div class="current_location_wrapper">
+            <p>緯度 【<a id="lat"></a>】</p>
+            <p>経度 【<a id="lng"></a>】</p>
+        </div>
+
+
+        <!-- 位置特定フォーム -->
+        <form>
+            <fieldset>
+                <div class="lat_land_input">
+                    <div>
+                        <div>
+                            緯度 <input type="text" id="input_lat">
+                        </div>
+                        <div>
+                            経度 <input type="text" id="input_lng">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button" id="send2">移動</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="blank"></div>
+
+
+        <!-- 投稿フォーム ※未-->
+        <form>
+            <div class="post_wrapper">
+
+                <div class="post_form">
+                    <div>
+                        店舗名 <input type="text" id="storeName" placeholder="マツキヨ 天地下">
+                    </div>
+                    <div>
+                        商品名 <input type="text" id="itemName" placeholder="13">
+                    </div>
+
+                    <div>
+                        緯度 <input type="text" id="submit_lat">
+                    </div>
+
+                    <div>
+                        経度 <input type="text" id="submit_lng">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="button" id="send">登録</button>
+                </div>
+            </div>
+        </form>
+
+
+        <div class="blank"></div>
+
+
+        <!-- 投稿一覧 -->
+        <div id="output"></div>
+
+
+
+
+
+
+
+    </main>
+
+    <!-- JSここから -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+    <!-- ★★★BING MAP -->
+    <script src="js/BmapQuery.js"></script>
+    <!-- API KEY -->
+    <script
+        src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=Arz2aNOTTDeKa4qpl1M99ds4QxY1mtwlQrmlUD0_RtiCiXQbdz9KZXlNv2P-_l4L"
+        async defer>
+        </script>
+
+    <script>
+
+        // window.onload = function () {...} を用いることで，全てのスクリプトが読み込まれてから {} 内が実行されるように記述できる
+
+        window.onload = function () {
+            navigator.geolocation.getCurrentPosition(mapsInit, showError, option);
+        };
+
+        // ピンを表示する関数
+
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng);
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: "navy",
+                visible: true,
+            });
+            map.entities.push(pin);
+        }
+
+        // ピンを表示する関数2(入力した値から)
+
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng);
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: "red",
+                visible: true,
+            });
+            map.entities.push(pin);
+        }
+
+
+
+
+
+
+
+        // 位置情報を取るために使う関数を作る（準備）
+
+        let map;
+
+        // geo_and_map.html
+
+        function mapsInit(position) {
+            console.log(position.coords.latitude);
+            console.log(position.coords.longitude);
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // マップを引っ張ってくる、その中央はlatとlng
+            map = new Microsoft.Maps.Map("#map", {
+                center: {
+                    latitude: lat,
+                    longitude: lng,
+                },
+                zoom: 15,
+            });
+        }
+
+        // ピンを立てる関数
+
+        function mapsInit(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map = new Microsoft.Maps.Map("#map", {
+                center: {
+                    latitude: lat,
+                    longitude: lng,
+                },
+                zoom: 15,
+            });
+            pushPin(lat, lng, map);
+        }
+
+        // infobox（吹き出し）を生成する関数
+        // geo_and_map.html
+
+        // function generateInfobox(lat, lng, map) {
+        //     const location = new Microsoft.Maps.Location(lat, lng);
+        //     const infobox = new Microsoft.Maps.Infobox(location, {
+        //         title: `G's ACADEMY`,
+        //         description: "JavaScript!!!",
+        //     });
+        //     infobox.setMap(map);
+        // }
+
+
+        // マップ表示後に関数を実行する．
+        function mapsInit(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map = new Microsoft.Maps.Map("#map", {
+                center: {
+                    latitude: lat,
+                    longitude: lng,
+                },
+                zoom: 15,
+            });
+            pushPin(lat, lng, map);
+            generateInfobox(lat, lng, map);
+        }
+
+
+
+
+        // 
+        function showPosition(position) { //位置情報の取得に成功した場合に実行される関数"showPosition"をつくる
+            console.log(position);
+            const lat = position.coords.latitude;//緯度
+            const lng = position.coords.longitude;//経度  
+            console.log(lat, lng);
+
+            $("#lat").text(lat)
+            $("#lng").text(lng)
+
+
+        }
+
+        //位置情報の取得に失敗した場合に実行される関数
+        // エラーの種類の順番は決まっている
+        function showError(error) {
+            const errorMessages = [
+                "位置情報が許可されてません",
+                "現在位置を特定できません",
+                "位置情報を取得する前にタイムアウトになりました",
+            ];
+            alert(`error:${errorMessages[error.code - 1]}`);
+        }
+
+        // 位置情報の取得に必要なオプション
+        const option = {
+            enableHighAccuracy: true,
+            maximumAge: 20000,
+            timeout: 1000000,
+        };
+
+
+
+
+        // 位置情報をとる
+        navigator.geolocation.getCurrentPosition(showPosition, showError, option);;
+
+
+
+
+
+    </script>
+
+
+    <!-- ★★★Firestore Database -->
+    <!-- API KEY -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            serverTimestamp,
+            query,
+            orderBy,
+            onSnapshot, //firebaseが持ってる関数を引っ張ってくる
+        } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
+
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY9-_p-2tYGNZ7ovnE8xGiC4mBr8KvzhM",
+            authDomain: "homework-api-368607.firebaseapp.com",
+            projectId: "homework-api-368607",
+            storageBucket: "homework-api-368607.appspot.com",
+            messagingSenderId: "126166796208",
+            appId: "1:126166796208:web:c1b53aaf8c7330efd57875"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 動作に関わる記述↓
+
+        // chatapp.html
+
+        $("#send").on("click", function () {
+            // 送信時に必要な処理
+
+            const storeName = $("#storeName").val();
+            const itemName = $("#itemName").val();
+
+            const postData = {
+                // name: firstname, //val→要素などのvalue値を取得する.nameやtextはkey.
+
+                // number: comment,
+                // place: comment,
+                storeName: storeName,
+                itemName: itemName,
+                time: serverTimestamp(), //★serverTimestamp→FBの仕様で現在時刻をとってくる
+            }; //postDataの定数はオブジェクト型の定数。以降出てきてもpostDataの中身はいじれない。
+            console.log(postData);
+
+            addDoc(collection(db, "board"), postData); //addDoc(ランダムなIDが付与されたドキュメントの作成)、FBに登録している
+            $("#storeName").val(""); //#textのvalue値を取得する→#textを空にする
+            $("#itemName").val(""); //#nameを空にする
+
+
+
+
+        });
+
+
+
+
+        // ↓ページが読み込まれた時点で発動してるもの
+        // 【時間順に並べる】
+        // データの取得の条件を指定する（ここでは時間の新しい順に並び替え）
+        const q = query(collection(db, "board"), orderBy("time", "desc"));//timeパートだけ見て最新順に並べ替えてって指示をFBに出して
+        // 【共通用語】query⇨timeとかnameそれぞれに入力されたものが入った箱
+        // 変数qの引数がquery以下＆orderBy
+        // orderBy→並べ替える
+        // 定数qに＝以降の処理を入れたい
+
+
+        onSnapshot(q, (querySnapshot) => { //並び替えた状態のものqを変数Aに入れてください
+            console.log(querySnapshot.docs);
+            //onSnapshot() はデータベース上でデータの変更が発生したタイミングで {} 内の処理を実行する．
+            // データ取得条件がここまで
+            // querySnapshotは勝手に決めた変数名
+            // 
+
+
+
+            // ①データ取得処理
+            // onSnapshot(collection(db, "chat"), (querySnapshot) => {
+            //   console.log(querySnapshot.docs);
+
+
+            // 上記 querySnapshot.docs は非常に複雑な形となっており，このまま扱うことは難しい．
+            // そのため，必要なデータのみ抽出した「オブジェクト形式の配列」に変換する．
+            // ②【データの取り出し】
+            const documents = []; //documents配列を作る
+            querySnapshot.docs.forEach(function (doc) { //forEach→配列に特化したループ構文 各要素を出力する
+                // querysnapshotの中のdocsの中の値だけを1件ずつforEachで出力する
+                const document = {
+                    id: doc.id, //.id でドキュメント ID（名前）を取得する． id→key doc.id→value
+                    data: doc.data(), //.data() でドキュメント中身（3 項目）を取得する．
+                }; //オブジェクト型の定数の名前をdocumentとします
+                documents.push(document);
+            });
+
+            console.log(documents);
+
+
+            // 【画面表示するためのタグ生成】
+
+            const htmlElements = [] //配列htmlElements（中身空っぽ）を作ります
+            documents.forEach(function (document) { //documentsは変数名。forEach→1件1件出力する。出力したものを毎回documentに入れて、
+                htmlElements.push(`
+      <p>${convertTimestampToDatetime(document.data.time.seconds)}</p>
+      <p>${document.data.storeName} </p>
+      <p>${document.data.itemName}</p><hr>
+
+  `); //配列htmlElementsに(以下を入れるよ
+                // `(バッククオーテーション)で囲むと、改行が可能
+            });
+
+            console.log(htmlElements)
+
+            $("#output").html(htmlElements);
+            //配列オールを#outputに表示する
+        });
+
+
+
+    </script>
+
+    <script>
+        // 日時をいい感じの形式にする関数
+        function convertTimestampToDatetime(timestamp) {
+            const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+            const Y = _d.getFullYear();
+            const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+            const d = _d.getDate().toString().padStart(2, '0');
+            const H = _d.getHours().toString().padStart(2, '0');
+            const i = _d.getMinutes().toString().padStart(2, '0');
+            const s = _d.getSeconds().toString().padStart(2, '0');
+            return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+        }
+    </script>
+</body>
+
+</html>
